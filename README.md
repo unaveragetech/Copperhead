@@ -305,15 +305,19 @@ Compiles everything into one optimized binary. Best for production.
 
 ## Examples
 
-See the `examples/` directory:
+See the `demo/` directory:
 
 | File | What It Shows |
 |------|---------------|
-| `basic_math.py` | Simple math operations |
-| `data_processing.py` | Working with lists and dicts |
-| `ownership.py` | Advanced memory control |
-| `performance.py` | Speed comparisons |
-| `abstract_examples.py` | Complex algorithms |
+| `standard_python.py` | Standard Python speed baseline |
+| `copperhead_version.py` | Copperhead equivalent |
+| `compare.py` | Side-by-side comparison |
+| `test_ai_generation.py` | AI code generation test |
+| `comprehensive_test.py` | Full integration test suite |
+| `test_ollama_real.py` | Real Ollama AI tests |
+| `test_ambiguous.py` | AI ambiguity handling |
+| `test_interpreter.py` | Interpreter tests |
+| `populate_registry.py` | Registry population script |
 
 ---
 
@@ -341,16 +345,21 @@ pytest copperhead/tests/test_transpiler.py # Transpiler
 
 ```
 copperhead/
-├── __init__.py          # Core types and decorators
-├── parser.py            # Reads and understands Python code
-├── transpiler.py        # Converts Python to Rust (PyO3 0.23)
-├── compiler.py          # Builds Rust binaries via Cargo
-├── cli.py               # Command-line interface
-├── llm.py               # AI agent (Ollama)
-├── debugger.py          # Code validation
-├── registry.py          # Module database (SQLite)
-├── interpreter.py       # Interactive workspace
-└── tests/               # 179 tests
+├── copperhead/             # Core package
+│   ├── __init__.py         # Core types and decorators
+│   ├── parser.py           # Reads and understands Python code
+│   ├── transpiler.py       # Converts Python to Rust (PyO3 0.23)
+│   ├── compiler.py         # Builds Rust binaries via Cargo
+│   ├── cli.py              # Command-line interface
+│   ├── llm.py              # AI agent (Ollama)
+│   ├── debugger.py         # Code validation
+│   ├── registry.py         # Module database (SQLite)
+│   ├── interpreter.py      # Interactive workspace
+│   ├── examples/           # Package examples
+│   └── tests/              # 179 unit tests
+├── demo/                   # Demo and test scripts
+├── docs/                   # Documentation + GitHub Pages
+└── pyproject.toml          # Package config
 ```
 
 ---

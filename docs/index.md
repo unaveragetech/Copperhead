@@ -744,12 +744,13 @@ pytest copperhead/tests/test_cli.py        # CLI
 | `WHITEPAPER.md` | Plain-English explanation |
 | `ROADMAP.md` | Future plans |
 | `LICENSE` | MIT license |
-| `INDEX.md` | This file - complete reference |
+| `INDEX.md` | Complete reference |
 | `docs/ARCHITECTURE.md` | Technical deep dive |
 | `docs/API_REFERENCE.md` | Complete function list |
 | `docs/GETTING_STARTED.md` | Step-by-step guide |
 | `docs/TUTORIAL.md` | 10-lesson tutorial |
-| `examples/*.py` | Working code samples |
+| `docs/PRACTICAL_EXAMPLE.md` | Speed comparison demo |
+| `demo/*.py` | Demo and test scripts |
 
 ---
 
