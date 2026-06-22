@@ -1,0 +1,15 @@
+include LICENSE
+include README.md
+include ROADMAP.md
+include WHITEPAPER.md
+include INDEX.md
+include pyproject.toml
+
+recursive-include copperhead *.py
+recursive-include docs *.md
+recursive-include examples *.py
+
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude *.db
