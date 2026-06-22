@@ -21,7 +21,7 @@ class TestModuleRegistry:
     
     def test_registry_initialization(self):
         """Test registry initialization."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             assert os.path.exists(db_path)
@@ -34,7 +34,7 @@ class TestModuleRegistry:
     
     def test_register_module(self):
         """Test module registration."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             
@@ -63,7 +63,7 @@ class TestModuleRegistry:
     
     def test_get_module(self):
         """Test getting a module."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             
@@ -88,7 +88,7 @@ class TestModuleRegistry:
     
     def test_get_nonexistent_module(self):
         """Test getting a nonexistent module."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             
@@ -103,7 +103,7 @@ class TestModuleRegistry:
     
     def test_search_modules(self):
         """Test searching modules."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             
@@ -128,7 +128,7 @@ class TestModuleRegistry:
     
     def test_search_functions(self):
         """Test searching functions."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             
@@ -164,7 +164,7 @@ class TestModuleRegistry:
     
     def test_delete_module(self):
         """Test deleting a module."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             
@@ -189,7 +189,7 @@ class TestModuleRegistry:
     
     def test_update_usage(self):
         """Test updating usage count."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             
@@ -216,7 +216,7 @@ class TestModuleRegistry:
     
     def test_get_stats(self):
         """Test getting statistics."""
-        db_path = f"test_registry_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_registry_{int(time.time()*1000)}.db")
         try:
             registry = ModuleRegistry(db_path)
             

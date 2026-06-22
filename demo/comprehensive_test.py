@@ -352,7 +352,7 @@ def add(x: float, y: float) -> float:
         from copperhead.registry import ModuleRegistry, ModuleMetadata, FunctionSignature
         
         # Create test database
-        db_path = f"test_comprehensive_{int(time.time()*1000)}.db"
+        db_path = os.path.join(tempfile.gettempdir(), f"test_comprehensive_{int(time.time()*1000)}.db")
         registry = ModuleRegistry(db_path)
         
         # Test registration
