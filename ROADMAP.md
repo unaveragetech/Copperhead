@@ -12,13 +12,17 @@ What we're building next.
 - Full type system (16 primitive types, 4 collection types, 2 ownership types)
 - AST parser with type extraction and RPB detection
 - Rust transpiler with PyO3 0.23 bindings (supports Python 3.13)
+- Complete AST coverage: all 28 statement types, all 27 expression types
+- 60+ Python builtins mapped to Rust equivalents
+- 40+ string methods mapped (upper, lower, strip, replace, split, find, join, etc.)
+- 10+ Vec/Dict methods mapped (append→push, get, keys, values, items, etc.)
 - Compiler pipeline: Python → AST → Rust → Cargo → `.dll`/`.so`
 - CLI with 10 commands
 - AI agent with Ollama integration (verified with real models)
 - Module registry with SQLite (13 pre-loaded examples)
 - Debugger with syntax/type/pattern/safety checks
 - Interactive interpreter (shared workspace for user+AI)
-- 179 unit tests + 52 comprehensive integration tests (all passing)
+- 375 unit tests (196 AST coverage + 179 core tests, all passing)
 - Package builds and publishes to PyPI
 
 **Verified on:**
@@ -42,6 +46,10 @@ What we're building next.
 - [x] Debugger with syntax/type/pattern checks
 - [x] Interactive interpreter
 - [x] 179 unit tests + 52 integration tests
+- [x] 196 AST coverage tests (all 28 statement types, all 27 expression types)
+- [x] 60+ Python builtins mapped to Rust
+- [x] 40+ string methods mapped to Rust
+- [x] 10+ Vec/Dict methods mapped to Rust
 - [x] PyO3 0.23 compatibility (Python 3.13 support)
 - [x] Package builds and passes `twine check`
 - [x] White paper for non-technical audience
@@ -65,15 +73,15 @@ What we're building next.
 
 ---
 
-## Phase 2: Core Features
+## Phase 2: Core Features (Complete)
 
 ### v0.2.0 - Enhanced Transpilation
-- [ ] Python class transpilation
-- [ ] Lambda function transpilation
-- [ ] List comprehension support
-- [ ] Generator/iterator support
-- [ ] Decorator chain support
-- [ ] Context manager support (`with` statements)
+- [x] Python class transpilation
+- [x] Lambda function transpilation
+- [x] List comprehension support
+- [x] Generator/iterator support
+- [x] Decorator chain support
+- [x] Context manager support (`with` statements)
 
 ### v0.2.1 - Advanced Types
 - [ ] Generic types (TypeVar)
@@ -84,10 +92,10 @@ What we're building next.
 - [ ] Literal types
 
 ### v0.2.2 - Real Function Bodies
-- [ ] Transpile actual Python function bodies to Rust (not placeholders)
-- [ ] Support for loops, conditionals, and basic expressions
-- [ ] Support for function calls and returns
-- [ ] Support for variable assignment and mutation
+- [x] Transpile actual Python function bodies to Rust (not placeholders)
+- [x] Support for loops, conditionals, and basic expressions
+- [x] Support for function calls and returns
+- [x] Support for variable assignment and mutation
 
 ---
 

@@ -267,7 +267,7 @@ Your Python Code
 - **AI agent**: Generates valid code from natural language descriptions
 - **Registry**: SQLite database with 13 pre-loaded example functions
 - **Debugger**: Syntax, type, pattern, and safety checking
-- **179 unit tests + 52 integration tests**: All passing
+- **375 unit tests**: 196 AST coverage + 179 core tests, all passing
 
 ---
 
@@ -275,7 +275,7 @@ Your Python Code
 
 ### Step 1: Install Copperhead
 ```bash
-pip install copperhead
+pip install copperhead-rust-puthon
 ```
 
 ### Step 2: Write Python Code

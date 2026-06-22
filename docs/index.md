@@ -45,14 +45,14 @@ result = fast_sum([1.0, 2.0, 3.0])  # Runs at Rust speed
 |-----------|--------|---------|
 | Type system | Complete | 16 primitives, 4 collections, 2 ownership types |
 | Parser | Complete | AST parsing, type extraction, RPB detection |
-| Transpiler | Complete | Python AST → Rust with PyO3 0.23 bindings |
+| Transpiler | Complete | All 28 stmt types, 27 expr types, 60+ builtins, 40+ string methods, 10+ Vec/Dict methods |
 | Compiler | Complete | Python → Cargo build → `.dll`/`.so` |
 | CLI | Complete | 10 commands (build, lint, transpile, etc.) |
 | AI agent | Complete | Ollama integration, natural language → code |
 | Registry | Complete | SQLite DB, 13 pre-loaded examples, search |
 | Debugger | Complete | Syntax, type, pattern, safety checks |
 | Interpreter | Complete | Shared workspace for human + AI |
-| Tests | Complete | 179 unit + 52 integration (all passing) |
+| Tests | Complete | 375 tests (196 AST coverage + 179 core, all passing) |
 
 ### Verified Environment
 
@@ -64,8 +64,7 @@ result = fast_sum([1.0, 2.0, 3.0])  # Runs at Rust speed
 
 ### What's NOT Working Yet
 
-- Complex Python constructs (classes, generators, async)
-- Full function body transpilation (currently placeholder bodies)
+- Async/await (generates placeholder comments)
 - NumPy/Pandas integration
 - IDE plugins
 - Multi-file project bundling
@@ -87,7 +86,7 @@ copperhead-rust-puthon/
 │   ├── registry.py              # SQLite module database
 │   ├── interpreter.py           # Interactive workspace
 │   ├── examples/                # Package examples
-│   └── tests/                   # 179 unit tests
+│   └── tests/                   # 375 unit tests
 ├── demo/                        # Demo and test scripts
 │   ├── comprehensive_test.py    # Full integration test
 │   ├── test_ollama_real.py      # Real AI tests
@@ -109,7 +108,7 @@ copperhead-rust-puthon/
 ├── README.md                    # Project overview
 ├── WHITEPAPER.md                # Plain-English explanation
 ├── ROADMAP.md                   # Development roadmap
-├── LICENSE                      # MIT license
+├── LICENSE                      # SDUC-1.1 license
 ├── pyproject.toml               # Package config
 └── MANIFEST.in                  # Build manifest
 ```
@@ -121,7 +120,7 @@ copperhead-rust-puthon/
 ### Quick Install
 
 ```bash
-pip install copperhead
+pip install copperhead-rust-puthon
 ```
 
 ### From Source
@@ -709,8 +708,8 @@ pyo3 = { version = "0.23", features = ["extension-module"] }
 use pyo3::prelude::*;
 
 #[pyfunction]
-fn add(py: Python<'_>, a: f64, b: f64) -> PyResult<f64> {
-    Ok(0.0)  // Placeholder body
+fn add(_py: Python<'_>, a: f64, b: f64) -> PyResult<f64> {
+    return Ok((a + b));
 }
 
 #[pymodule]
@@ -801,7 +800,7 @@ name = "copperhead"
 version = "0.1.0"
 description = "Python to Rust transpiler"
 requires-python = ">=3.8"
-license = {text = "MIT"}
+license = {text = "SDUC-1.1"}
 authors = [{name = "Copperhead Team"}]
 
 [project.optional-dependencies]
@@ -821,7 +820,7 @@ testpaths = ["copperhead/tests"]
 ### Run All Tests
 
 ```bash
-# 179 unit tests
+# 375 unit tests (196 AST coverage + 179 core)
 pytest copperhead/tests/
 
 # 52 comprehensive integration tests

@@ -39,7 +39,7 @@ Before you begin, make sure you have:
 ### Step 1: Install Copperhead
 
 ```bash
-pip install copperhead
+pip install copperhead-rust-puthon
 ```
 
 ### Step 2: Verify Installation

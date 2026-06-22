@@ -14,11 +14,11 @@
 - **GitHub:** https://github.com/unaveragetech/copperhead-rust-puthon
 - **Docs Site:** https://copperhead-ad8qypth.manus.space
 - **Version:** 0.1.0
-- **License:** MIT
+- **License:** SDUC-1.1
 - **Python:** 3.8+ (tested on 3.13.3)
 - **Rust:** 1.89.0 / Cargo 1.89.0
 - **PyO3:** 0.23.5 (Python 3.13 compatible)
-- **Tests:** 179 passing + 52 comprehensive integration tests
+- **Tests:** 375 passing (196 AST coverage + 179 core) + 52 comprehensive integration tests
 
 ### Compiler Status
 
@@ -44,7 +44,7 @@ The full compilation pipeline is **verified working**:
 ## Installation
 
 ```bash
-pip install copperhead
+pip install copperhead-rust-puthon
 ```
 
 ### Prerequisites
@@ -714,7 +714,7 @@ def quicksort(arr: list[cp.f64]) -> list[cp.f64]:
 ### Run All Tests
 
 ```bash
-# 179 unit tests
+# 375 unit tests (196 AST coverage + 179 core)
 pytest copperhead/tests/
 
 # 52 comprehensive integration tests
@@ -743,7 +743,7 @@ pytest copperhead/tests/test_cli.py        # CLI
 | `README.md` | Project overview, quick start |
 | `WHITEPAPER.md` | Plain-English explanation |
 | `ROADMAP.md` | Future plans |
-| `LICENSE` | MIT license |
+| `LICENSE` | SDUC-1.1 license |
 | `INDEX.md` | This file - complete reference |
 | `docs/ARCHITECTURE.md` | Technical deep dive |
 | `docs/API_REFERENCE.md` | Complete function list |
@@ -831,7 +831,7 @@ pytest copperhead/tests/test_cli.py        # CLI
 
 | Metric | Value |
 |--------|-------|
-| Unit tests | 179 |
+| Unit tests | 375 (196 AST + 179 core) |
 | Integration tests | 52 |
 | Test pass rate | 100% |
 | Primitive types | 16 |

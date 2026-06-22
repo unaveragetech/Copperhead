@@ -4,9 +4,9 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-unaveragetech%2Fcopperhead--rust--puthon-blue?logo=github)](https://github.com/unaveragetech/copperhead-rust-puthon)
 [![Docs](https://img.shields.io/badge/Docs-Interactive-green?logo=markdown)](https://copperhead-ad8qypth.manus.space)
-[![Tests](https://img.shields.io/badge/tests-179%20passing-brightgreen)](https://github.com/unaveragetech/copperhead-rust-puthon/tree/main/copperhead/tests/)
+[![Tests](https://img.shields.io/badge/tests-375%20passing-brightgreen)](https://github.com/unaveragetech/copperhead-rust-puthon/tree/main/copperhead/tests/)
 [![Python](https://img.shields.io/badge/python-3.8+-blue)](https://python.org)
-[![License](https://img.shields.io/badge/license-SDUC-green)](https://github.com/unaveragetech/copperhead-rust-puthon/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-SDUC%201.1-green)](https://github.com/unaveragetech/copperhead-rust-puthon/blob/main/LICENSE)
 
 > **Interactive Documentation:** [copperhead-ad8qypth.manus.space](https://copperhead-ad8qypth.manus.space)
 
@@ -21,11 +21,15 @@ Copperhead is a programming tool that lets you write code in Python (the easy la
 ### What's Working Today
 
 - **Full compilation pipeline**: Python source → AST → Rust code → Cargo build → `.dll`/`.so`
+- **Complete AST coverage**: All 28 Python statement types and 27 expression types transpiled to Rust
+- **60+ Python builtins** mapped to Rust equivalents (len, range, abs, min, max, sum, sorted, etc.)
+- **40+ string methods** mapped (upper, lower, strip, replace, split, find, join, etc.)
+- **10+ Vec/Dict methods** mapped (append→push, get, keys, values, items, etc.)
 - **16 type primitives** mapped to Rust types via PyO3 0.23
 - **AI code generation** from natural language descriptions (verified with Ollama)
 - **Module registry** with 13 pre-loaded examples
-- **179 unit tests + 52 integration tests** (all passing)
-- **Package builds** and passes PyPI quality checks
+- **375 unit tests** (all passing) — comprehensive AST coverage, type system, parser, transpiler, compiler, CLI, LLM, registry, debugger
+- **Package builds** and passes PyPI quality checks (`twine check`)
 
 ---
 
@@ -33,8 +37,10 @@ Copperhead is a programming tool that lets you write code in Python (the easy la
 
 ### Install
 ```bash
-pip install copperhead
+pip install copperhead-rust-puthon
 ```
+
+> **Note:** The package name on PyPI is `copperhead-rust-puthon`, but you import it as `copperhead` and use the `copperhead` CLI command.
 
 ### Write Fast Python
 ```python
@@ -325,7 +331,7 @@ See the `demo/` directory:
 
 ### Run All Tests
 ```bash
-# 179 tests
+# 375 tests (196 AST coverage + 179 unit tests)
 pytest copperhead/tests/
 
 # Or run the comprehensive test
@@ -334,9 +340,10 @@ python comprehensive_test.py
 
 ### Run Specific Tests
 ```bash
-pytest copperhead/tests/test_types.py      # Type system
-pytest copperhead/tests/test_parser.py     # Parser
-pytest copperhead/tests/test_transpiler.py # Transpiler
+pytest copperhead/tests/test_ast_coverage.py  # AST coverage (196 tests)
+pytest copperhead/tests/test_types.py         # Type system
+pytest copperhead/tests/test_parser.py        # Parser
+pytest copperhead/tests/test_transpiler.py    # Transpiler
 ```
 
 ---
@@ -348,7 +355,7 @@ copperhead/
 ├── copperhead/             # Core package
 │   ├── __init__.py         # Core types and decorators
 │   ├── parser.py           # Reads and understands Python code
-│   ├── transpiler.py       # Converts Python to Rust (PyO3 0.23)
+│   ├── transpiler.py       # Converts Python to Rust (28 stmts, 27 exprs, 60+ builtins)
 │   ├── compiler.py         # Builds Rust binaries via Cargo
 │   ├── cli.py              # Command-line interface
 │   ├── llm.py              # AI agent (Ollama)
@@ -356,7 +363,7 @@ copperhead/
 │   ├── registry.py         # Module database (SQLite)
 │   ├── interpreter.py      # Interactive workspace
 │   ├── examples/           # Package examples
-│   └── tests/              # 179 unit tests
+│   └── tests/              # 375 unit tests (196 AST + 179 core)
 ├── demo/                   # Demo and test scripts
 ├── docs/                   # Documentation + GitHub Pages
 └── pyproject.toml          # Package config
@@ -466,7 +473,7 @@ pytest copperhead/tests/
 
 ## License
 
-SDUC License - Use it if your an individual
+SDUC License v1.1 (Small Developer Use Clause) - Free for individuals and small developers. See [LICENSE](https://github.com/unaveragetech/copperhead-rust-puthon/blob/main/LICENSE) for details.
 
 ---
 

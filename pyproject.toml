@@ -3,11 +3,11 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "copperhead"
+name = "copperhead-rust-puthon"
 version = "0.1.0"
 description = "Write Python. Run Rust. A Granular Transpilation Framework for Seamless Rust-Python Interoperability."
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "SDUC-1.1"}
 authors = [
     {name = "Unaveraged Tech", email = "hello@unaveragetech.com"}
 ]
@@ -15,7 +15,7 @@ keywords = ["python", "rust", "transpilation", "ffi", "performance", "ai", "code
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",

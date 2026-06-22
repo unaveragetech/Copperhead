@@ -337,39 +337,131 @@ pyo3 = { version = "0.23", features = ["extension-module"] }
 
 ### Transpiler Core Logic
 
+The transpiler uses dict-based dispatch to handle all Python AST node types:
+
 {% raw %}
 ```python
-class RustTranspiler:
-    def __init__(self):
-        self.imports = []
-        self.functions = []
+class CopperheadTranspiler:
+    def _transpile_statement(self, stmt: ast.stmt) -> Optional[str]:
+        """Transpile any of the 28 Python AST statement types."""
+        dispatch = {
+            ast.Return: self._transpile_return,
+            ast.Assign: self._transpile_assign,
+            ast.AnnAssign: self._transpile_ann_assign,
+            ast.AugAssign: self._transpile_aug_assign,
+            ast.If: self._transpile_if,
+            ast.For: self._transpile_for,
+            ast.While: self._transpile_while,
+            ast.Break: lambda s: "break;",
+            ast.Continue: lambda s: "continue;",
+            ast.Pass: lambda s: None,
+            ast.Expr: self._transpile_expr_statement,
+            ast.Assert: self._transpile_assert,
+            ast.FunctionDef: self._transpile_function_def,
+            ast.AsyncFunctionDef: self._transpile_async_function_def,
+            ast.ClassDef: self._transpile_class_def,
+            ast.Try: self._transpile_try,
+            ast.TryStar: self._transpile_try_star,
+            ast.With: self._transpile_with,
+            ast.AsyncWith: self._transpile_async_with,
+            ast.AsyncFor: self._transpile_async_for,
+            ast.Raise: self._transpile_raise,
+            ast.Import: self._transpile_import,
+            ast.ImportFrom: self._transpile_import_from,
+            ast.Global: self._transpile_global,
+            ast.Nonlocal: self._transpile_nonlocal,
+            ast.Delete: self._transpile_delete,
+            ast.Match: self._transpile_match,
+            ast.TypeAlias: self._transpile_type_alias,
+        }
+        handler = dispatch.get(type(stmt))
+        return handler(stmt) if handler else f"/* unsupported: {type(stmt).__name__} */"
 
-    def transpile(self, ast, rpbs, type_info):
-        """Transpile Python AST to Rust code."""
-        rust_code = []
-        rust_code.append("use pyo3::prelude::*;")
-        rust_code.append("use pyo3::types::PyModule;")
-
-        for rpb in rpbs:
-            rust_code.append(self._transpile_function(rpb, type_info))
-
-        rust_code.append(self._generate_module_init())
-        return "\n\n".join(rust_code)
-
-    def _transpile_function(self, func, type_info):
-        name = func.name
-        return_type = self._get_return_type(func, type_info)
-        args = self._get_arguments(func, type_info)
-        body = self._get_body(func)
-
-        return f"""
-#[pyfunction]
-fn {name}({args}) -> PyResult<{return_type}> {{
-    {body}
-}}
-"""
+    def transpile_expression(self, expr: ast.expr) -> str:
+        """Transpile any of the 27 Python AST expression types."""
+        dispatch = {
+            ast.Name: self._transpile_name,
+            ast.Constant: self._transpile_constant,
+            ast.BinOp: self._transpile_binary_op,
+            ast.UnaryOp: self._transpile_unary_op,
+            ast.BoolOp: self._transpile_bool_op,
+            ast.Compare: self._transpile_compare,
+            ast.Call: self._transpile_call,
+            ast.Attribute: self._transpile_attribute,
+            ast.Subscript: self._transpile_subscript,
+            ast.List: self._transpile_list,
+            ast.Dict: self._transpile_dict,
+            ast.Tuple: self._transpile_tuple,
+            ast.Set: self._transpile_set,
+            ast.IfExp: self._transpile_if_expr,
+            ast.Lambda: self._transpile_lambda,
+            ast.ListComp: self._transpile_list_comp,
+            ast.DictComp: self._transpile_dict_comp,
+            ast.SetComp: self._transpile_set_comp,
+            ast.GeneratorExp: self._transpile_generator_exp,
+            ast.NamedExpr: self._transpile_named_expr,
+            ast.Starred: self._transpile_starred,
+            ast.Slice: self._transpile_slice,
+            ast.Yield: self._transpile_yield,
+            ast.YieldFrom: self._transpile_yield_from,
+            ast.Await: self._transpile_await,
+            ast.JoinedStr: self._transpile_joined_str,
+            ast.FormattedValue: self._transpile_formatted_value,
+        }
+        handler = dispatch.get(type(expr))
+        return handler(expr) if handler else "PyObject::None(_py)"
 ```
 {% endraw %}
+
+### Built-in Function Mapping
+
+The transpiler maps 60+ Python builtins to Rust equivalents:
+
+| Python | Rust | Notes |
+|--------|------|-------|
+| `len(x)` | `(x).len() as i64` | Works on Vec, String, HashMap |
+| `range(n)` | `0..n` | Range syntax |
+| `abs(x)` | `(x).abs()` | |
+| `min(a, b)` | `(a).min(b)` | |
+| `max(a, b)` | `(a).max(b)` | |
+| `sum(x)` | `(x).iter().sum::<i64>()` | |
+| `sorted(x)` | `(x).iter().sorted().collect::<Vec<_>>()` | |
+| `enumerate(x)` | `(x).iter().enumerate()` | |
+| `reversed(x)` | `(x).iter().rev()` | |
+| `any(x)` | `(x).iter().any(|x| *x)` | |
+| `all(x)` | `(x).iter().all(|x| *x)` | |
+| `chr(n)` | `char::from_u32(n as u32)` | |
+| `ord(s)` | `(s).as_bytes()[0] as i64` | |
+| `hex(n)` | `format!("0x{:x}", n)` | |
+| `int(x)` | `(x as i64)` | |
+| `float(x)` | `(x as f64)` | |
+| `str(x)` | `(x).to_string()` | |
+| `bool(x)` | `(x as bool)` | |
+| `divmod(a, b)` | `((a / b), (a % b))` | Returns tuple |
+| `pow(a, b)` | `(a).powi(b as i32)` | |
+| `round(x)` | `(x).round()` | |
+
+### String Method Mapping
+
+40+ string methods are mapped to Rust equivalents:
+
+| Python | Rust |
+|--------|------|
+| `s.upper()` | `(s).to_uppercase()` |
+| `s.lower()` | `(s).to_lowercase()` |
+| `s.strip()` | `(s).trim()` |
+| `s.lstrip()` | `(s).trim_start()` |
+| `s.rstrip()` | `(s).trim_end()` |
+| `s.replace(a, b)` | `(s).replace(&a, &b)` |
+| `s.split(sep)` | `(s).split(&sep).map(\|s\| s.to_string()).collect::<Vec<_>>()` |
+| `s.find(sub)` | `(s).find(&sub).map(\|i\| i as i64).unwrap_or(-1)` |
+| `s.count(sub)` | `(s).matches(&sub).count() as i64` |
+| `s.startswith(p)` | `(s).starts_with(&p)` |
+| `s.endswith(p)` | `(s).ends_with(&p)` |
+| `sep.join(parts)` | `(parts).join(&sep)` |
+| `s.isalpha()` | `(s).chars().all(\|c\| c.is_alphabetic())` |
+| `s.isdigit()` | `(s).chars().all(\|c\| c.is_numeric())` |
+| `s.encode()` | `(s).as_bytes().to_vec()` |
 
 ---
 

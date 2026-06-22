@@ -41,7 +41,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/p/copperhead
+      url: https://pypi.org/p/copperhead-rust-puthon
 
     permissions:
       id-token: write
@@ -63,7 +63,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/copperhead
+      url: https://test.pypi.org/p/copperhead-rust-puthon
 
     permissions:
       id-token: write
