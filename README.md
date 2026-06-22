@@ -6,7 +6,7 @@
 [![Docs](https://img.shields.io/badge/Docs-Interactive-green?logo=markdown)](https://copperhead-ad8qypth.manus.space)
 [![Tests](https://img.shields.io/badge/tests-179%20passing-brightgreen)](https://github.com/unaveragetech/copperhead-rust-puthon/tree/main/copperhead/tests/)
 [![Python](https://img.shields.io/badge/python-3.8+-blue)](https://python.org)
-[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/unaveragetech/copperhead-rust-puthon/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-SDUC-green)](https://github.com/unaveragetech/copperhead-rust-puthon/blob/main/LICENSE)
 
 > **Interactive Documentation:** [copperhead-ad8qypth.manus.space](https://copperhead-ad8qypth.manus.space)
 
@@ -457,7 +457,7 @@ pytest copperhead/tests/
 
 ## License
 
-MIT License - Use it however you want.
+SDUC License - Use it if your an individual
 
 ---
 
