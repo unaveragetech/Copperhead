@@ -73,7 +73,12 @@ class CopperheadTranspiler:
         """Transpile a module to Rust code."""
         lines = []
 
+        # Track module-level function names for recursive calls
+        self._module_func_names = {f.name for f in module_info.functions if f.is_rpb}
+
         lines.append("use pyo3::prelude::*;")
+        lines.append("use std::collections::HashMap;")
+        lines.append("use std::collections::HashSet;")
         lines.append("")
 
         for imp in module_info.imports:
@@ -169,6 +174,11 @@ class CopperheadTranspiler:
         lines = []
         self.indent_level = 1
 
+        # Add mutable shadowing for function args so they can be reassigned
+        for arg in func.args:
+            rust_type = self._python_type_to_rust(arg.type_info)
+            lines.append(self._indent(f"let mut {arg.name} = {arg.name};"))
+
         for stmt in func.body:
             result = self._transpile_statement(stmt)
             if result is not None:
@@ -252,13 +262,48 @@ class CopperheadTranspiler:
             elif isinstance(target, ast.Tuple) or isinstance(target, ast.List):
                 names = [e.id for e in target.elts if isinstance(e, ast.Name)]
                 if names:
-                    unpacked = ", ".join(names)
+                    # Check if any of the names are already declared
+                    all_declared = all(n in self.local_vars for n in names)
+                    any_declared = any(n in self.local_vars for n in names)
                     for n in names:
                         if n not in self.local_vars:
                             self.local_vars[n] = "PyObject"
-                    results.append(f"let ({unpacked}) = {value};")
-                else:
-                    results.append(f"/* tuple assign: {type(target).__name__} */")
+                    if all_declared:
+                        # Reassignment: use temp variables to avoid borrow issues
+                        # a, b = b, a + b  =>  let _tmp0 = b; let _tmp1 = a + b; a = _tmp0; b = _tmp1;
+                        if isinstance(stmt.value, ast.Tuple):
+                            val_exprs = [self.transpile_expression(e) for e in stmt.value.elts]
+                            tmp_lines = []
+                            for i, (n, v) in enumerate(zip(names, val_exprs)):
+                                tmp_lines.append(f"let _tmp{i} = {v};")
+                            for i, n in enumerate(names):
+                                tmp_lines.append(f"{n} = _tmp{i};")
+                            results.append("\n".join(tmp_lines))
+                        else:
+                            results.append(f"let ({', '.join(names)}) = {value};")
+                    elif any_declared:
+                        # Mixed - some are new, some are old. Use let for new, reassign for old
+                        if isinstance(stmt.value, ast.Tuple):
+                            val_exprs = [self.transpile_expression(e) for e in stmt.value.elts]
+                            tmp_lines = []
+                            for i, (n, v) in enumerate(zip(names, val_exprs)):
+                                if n in self.local_vars and self.local_vars.get(n, "") != "PyObject":
+                                    tmp_lines.append(f"let _tmp{i} = {v};")
+                                else:
+                                    tmp_lines.append(f"let mut {n} = {v};")
+                            for i, n in enumerate(names):
+                                if self.local_vars.get(n, "") != "PyObject" and i < len(val_exprs):
+                                    pass  # Already handled above
+                            # Reassign the ones that were already declared
+                            for i, n in enumerate(names):
+                                if self.local_vars.get(n, "") == "PyObject":
+                                    pass  # Already declared with let above
+                            results.append("\n".join(tmp_lines))
+                        else:
+                            results.append(f"let ({', '.join(names)}) = {value};")
+                    else:
+                        unpacked = ", ".join(names)
+                        results.append(f"let mut ({unpacked}) = {value};")
             elif isinstance(target, ast.Starred):
                 results.append(f"/* starred assign */")
             elif isinstance(target, ast.Attribute):
@@ -466,9 +511,20 @@ class CopperheadTranspiler:
                 else:
                     lines = [f"for {var_name} in ({iter_expr}).into_iter() {{"]
             else:
-                lines = [f"for {var_name} in ({iter_expr}).into_iter() {{"]
+                if isinstance(stmt.iter, ast.Name) and self.local_vars.get(stmt.iter.id, "") == "String":
+                    lines = [f"for {var_name} in ({iter_expr}).chars() {{"]
+                    self.local_vars[var_name] = "char"
+                else:
+                    lines = [f"for {var_name} in ({iter_expr}).into_iter() {{"]
         else:
-            lines = [f"for {var_name} in ({iter_expr}).into_iter() {{"]
+            if isinstance(stmt.iter, ast.Name) and self.local_vars.get(stmt.iter.id, "") == "String":
+                lines = [f"for {var_name} in ({iter_expr}).chars() {{"]
+                self.local_vars[var_name] = "char"
+            elif isinstance(stmt.iter, ast.Name):
+                lines = [f"for {var_name} in ({iter_expr}).iter().copied() {{"]
+                self.local_vars[var_name] = self.local_vars.get(stmt.iter.id, "").replace("Vec<", "").replace(">", "")
+            else:
+                lines = [f"for {var_name} in ({iter_expr}).into_iter() {{"]
 
         self.indent_level += 1
         for s in stmt.body:
@@ -494,7 +550,15 @@ class CopperheadTranspiler:
     # ── While ────────────────────────────────────────────────────────────
 
     def _transpile_while(self, stmt: ast.While) -> str:
-        condition = self.transpile_expression(stmt.test)
+        # If condition is a bare Name that's an integer, add != 0
+        if isinstance(stmt.test, ast.Name):
+            var_type = self.local_vars.get(stmt.test.id, "")
+            if var_type in ("i64", "i32", "i16", "i8", "u64", "u32", "u16", "u8", "usize", "isize"):
+                condition = f"{stmt.test.id} != 0"
+            else:
+                condition = self.transpile_expression(stmt.test)
+        else:
+            condition = self.transpile_expression(stmt.test)
         lines = [f"while {condition} {{"]
         self.indent_level += 1
         for s in stmt.body:
@@ -962,6 +1026,10 @@ impl {name} {{
         left = self.transpile_expression(expr.left)
         right = self.transpile_expression(expr.right)
 
+        # Detect if we're dividing by len() - cast to f64
+        def _needs_float_cast(val):
+            return "as i64" in val and ".len()" in val
+
         op_map = {
             ast.Add: "+", ast.Sub: "-", ast.Mult: "*",
             ast.Div: "/", ast.Mod: "%",
@@ -972,7 +1040,46 @@ impl {name} {{
         if isinstance(expr.op, ast.Pow):
             return f"({left}).powi({right} as i32)"
         if isinstance(expr.op, ast.FloorDiv):
-            return f"({left} / {right}).floor() as i64"
+            return f"(({left}) as f64 / ({right}) as f64).floor() as i64"
+        if isinstance(expr.op, ast.Div):
+            right = f"({right}) as f64"
+            left = f"({left}) as f64"
+        if isinstance(expr.op, ast.Mult):
+            # Cast i64 vars to f64 when the other side is likely f64
+            def _is_int_var(e):
+                if isinstance(e, ast.Name):
+                    t = self.local_vars.get(e.id, "")
+                    return t in ("i64", "i32", "i16", "i8", "u64", "u32", "u16", "u8", "usize", "isize")
+                if isinstance(e, ast.Constant) and isinstance(e.value, int) and not isinstance(e.value, bool):
+                    return True
+                return False
+            def _is_float_expr(e):
+                if isinstance(e, ast.Name):
+                    t = self.local_vars.get(e.id, "")
+                    return t in ("f64", "f32")
+                if isinstance(e, ast.Constant) and isinstance(e.value, float):
+                    return True
+                if isinstance(e, ast.Call):
+                    # cp.f64(0) produces f64
+                    if isinstance(e.func, ast.Attribute) and e.func.attr in ("f64", "f32"):
+                        return True
+                    if isinstance(e.func, ast.Name) and e.func.id in ("float", "f64", "f32"):
+                        return True
+                if isinstance(e, ast.BinOp):
+                    return _is_float_expr(e.left) or _is_float_expr(e.right)
+                return False
+            left_is_int = _is_int_var(expr.left)
+            right_is_int = _is_int_var(expr.right)
+            left_is_float = _is_float_expr(expr.left)
+            right_is_float = _is_float_expr(expr.right)
+            if left_is_int and right_is_float:
+                left = f"({left}) as f64"
+            elif right_is_int and left_is_float:
+                right = f"({right}) as f64"
+            elif left_is_float and isinstance(expr.right, ast.Name) and self.local_vars.get(expr.right.id, "") == "PyObject":
+                right = f"({right}) as f64"
+            elif right_is_float and isinstance(expr.left, ast.Name) and self.local_vars.get(expr.left.id, "") == "PyObject":
+                left = f"({left}) as f64"
         op = op_map.get(type(expr.op), "+")
         return f"({left} {op} {right})"
 
@@ -1007,6 +1114,19 @@ impl {name} {{
 
         for op, comparator in zip(expr.ops, expr.comparators):
             right = self.transpile_expression(comparator)
+            # Handle char vs string comparison: if one side is char and other is
+            # a single-char string constant, use char literal
+            if isinstance(op, (ast.Eq, ast.NotEq)):
+                left_is_char = isinstance(expr.left, ast.Name) and self.local_vars.get(expr.left.id, "") == "char"
+                right_is_str_const = isinstance(comparator, ast.Constant) and isinstance(comparator.value, str) and len(comparator.value) == 1
+                right_is_char = isinstance(comparator, ast.Name) and self.local_vars.get(comparator.id, "") == "char"
+                left_is_str_const = isinstance(expr.left, ast.Constant) and isinstance(expr.left.value, str) and len(expr.left.value) == 1
+
+                if left_is_char and right_is_str_const:
+                    right = f"'{comparator.value}'"
+                elif right_is_char and left_is_str_const:
+                    left = f"'{expr.left.value}'"
+
             if isinstance(op, (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)):
                 op_str = {ast.Eq: "==", ast.NotEq: "!=", ast.Lt: "<",
                           ast.LtE: "<=", ast.Gt: ">", ast.GtE: ">="}[type(op)]
@@ -1032,6 +1152,52 @@ impl {name} {{
         args = [self.transpile_expression(arg) for arg in expr.args]
         keywords = {kw.arg: self.transpile_expression(kw.value) for kw in expr.keywords}
         args_str = ", ".join(args)
+
+        # Handle cp.f64(x), cp.i64(x), cp.f32(x), etc. as type casts
+        if isinstance(expr.func, ast.Attribute):
+            obj = expr.func.value
+            attr = expr.func.attr
+            if isinstance(obj, ast.Name) and obj.id in ("cp", "copperhead"):
+                type_casts = {
+                    "f64": "f64", "f32": "f32", "i64": "i64", "i32": "i32",
+                    "i16": "i16", "i8": "i8", "u64": "u64", "u32": "u32",
+                    "u16": "u16", "u8": "u8", "usize": "usize", "isize": "isize",
+                }
+                if attr in type_casts and args:
+                    return f"({args[0]} as {type_casts[attr]})"
+                if attr == "bool" and args:
+                    return f"({args[0]} as bool)"
+                if attr == "str" and args:
+                    return f"({args[0]}).to_string()"
+                if attr == "Vec" and args:
+                    return f"Vec::from({args[0]})"
+                if attr == "HashMap" and args:
+                    return f"HashMap::new()"
+                if attr == "Ok" and args:
+                    return f"Ok({args[0]})"
+                if attr == "Err" and args:
+                    return f"Err({args[0]})"
+
+            # Handle cp.math.sin(x), cp.math.sqrt(x), etc.
+            if isinstance(obj, ast.Attribute):
+                inner_obj = obj.value
+                inner_attr = obj.attr
+                if isinstance(inner_obj, ast.Name) and inner_obj.id in ("cp", "copperhead") and inner_attr == "math":
+                    math_methods = {
+                        "sin": "sin", "cos": "cos", "tan": "tan",
+                        "sqrt": "sqrt", "abs": "abs", "floor": "floor", "ceil": "ceil",
+                        "round": "round", "log": "ln", "log2": "log2", "log10": "log10",
+                        "exp": "exp", "asin": "asin", "acos": "acos", "atan": "atan",
+                        "sinh": "sinh", "cosh": "cosh", "tanh": "tanh",
+                    }
+                    if attr in math_methods and args:
+                        return f"({args[0]}).{math_methods[attr]}()"
+                    if attr == "pow" and len(args) >= 2:
+                        return f"({args[0]}).powi({args[1]} as i32)"
+                    if attr == "atan2" and len(args) >= 2:
+                        return f"({args[0]}).atan2({args[1]})"
+                    if attr in ("min", "max") and len(args) >= 2:
+                        return f"({args[0]}).{attr}({args[1]})"
 
         builtins = {
             "len": self._call_len,
@@ -1109,6 +1275,10 @@ impl {name} {{
         if "." in func_name:
             return self._transpile_method_call(func_name, args, keywords)
 
+        # If calling a module-level RPB function, pass _py and unwrap result
+        if hasattr(self, '_module_func_names') and func_name in self._module_func_names:
+            return f"{func_name}(_py, {args_str}).unwrap()"
+
         return f"{func_name}({args_str})"
 
     # ── Built-in function handlers ───────────────────────────────────────
@@ -1151,12 +1321,18 @@ impl {name} {{
 
     def _call_min(self, args, kw):
         if len(args) >= 2:
-            return f"({args[0]}).min({args[1]})"
+            result = f"({args[0]}).min({args[1]})"
+            for a in args[2:]:
+                result = f"({result}).min({a})"
+            return result
         return f"({args[0]}).iter().min().copied().unwrap_or_default()" if args else "0"
 
     def _call_max(self, args, kw):
         if len(args) >= 2:
-            return f"({args[0]}).max({args[1]})"
+            result = f"({args[0]}).max({args[1]})"
+            for a in args[2:]:
+                result = f"({result}).max({a})"
+            return result
         return f"({args[0]}).iter().max().copied().unwrap_or_default()" if args else "0"
 
     def _call_sum(self, args, kw):
@@ -1175,11 +1351,13 @@ impl {name} {{
     def _call_sorted(self, args, kw):
         reverse = kw.get("reverse", "false")
         key = kw.get("key", "")
+        if not args:
+            return "Vec::new()"
         if key:
-            return f"({args[0]}).iter().sorted_by_key(|x| {key}(x.clone())).collect::<Vec<_>>()" if args else "Vec::new()"
+            return f"{{ let mut v: Vec<_> = ({args[0]}).iter().cloned().collect(); v.sort_by_key(|x| {key}(x.clone())); v }}"
         if reverse == "true":
-            return f"({args[0]}).iter().sorted().rev().collect::<Vec<_>>()" if args else "Vec::new()"
-        return f"({args[0]}).iter().sorted().collect::<Vec<_>>()" if args else "Vec::new()"
+            return f"{{ let mut v: Vec<_> = ({args[0]}).iter().cloned().collect(); v.sort_by(|a, b| b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal)); v }}"
+        return f"{{ let mut v: Vec<_> = ({args[0]}).iter().cloned().collect(); v.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)); v }}"
 
     def _call_zip(self, args, kw):
         return f"({', '.join(args)}).into_iter()" if args else "(0..0).into_iter()"
@@ -1241,7 +1419,16 @@ impl {name} {{
         return f"({args[0]}).to_vec()" if args else "()"
 
     def _call_list(self, args, kw):
-        return f"({args[0]}).to_vec()" if args else "Vec::new()"
+        if not args:
+            return "Vec::new()"
+        a = args[0]
+        if a.startswith("(") and ".." in a:
+            return f"({a}).collect::<Vec<_>>()"
+        if ".iter()" in a or ".rev()" in a or ".enumerate()" in a:
+            return f"({a}).collect::<Vec<_>>()"
+        if "into_iter()" in a:
+            return f"({a}).collect::<Vec<_>>()"
+        return f"({a}).to_vec()"
 
     def _call_dict(self, args, kw):
         return f"({args[0]}).clone()" if args else "HashMap::new()"
@@ -1472,6 +1659,9 @@ impl {name} {{
             if method == "split" and args:
                 return f"({obj}).split(&{args[0]}).map(|s| s.to_string()).collect::<Vec<_>>()"
             if method == "join" and args:
+                sep = obj.strip("()")
+                if sep.startswith('""') or sep.startswith("''.to_string()") or sep == '""' or "to_string()" in sep and sep.startswith('"'):
+                    return f"({args[0]}).iter().collect::<String>()"
                 return f"({args[0]}).join(&{obj})"
             if method == "find" and args:
                 return f"({obj}).find(&{args[0]}).map(|i| i as i64).unwrap_or(-1)"
@@ -1645,11 +1835,11 @@ impl {name} {{
         }
 
         if obj in ("cp", "copperhead") and attr == "math":
-            return "math"
-        if obj == "math" and attr in math_funcs:
-            return f"math::{attr}"
+            return "__cp_math__"
+        if obj == "__cp_math__" and attr in math_funcs:
+            return f"__cp_math__::{attr}"
         if obj in ("cp", "copperhead") and attr in math_funcs:
-            return f"math::{attr}"
+            return f"__cp_math__::{attr}"
 
         if attr == "PI":
             return "std::f64::consts::PI"
@@ -1667,18 +1857,38 @@ impl {name} {{
     # ── Subscript ────────────────────────────────────────────────────────
 
     def _transpile_subscript(self, expr: ast.Subscript) -> str:
-        obj = self.transpile_expression(expr.value)
+        obj_raw = expr.value
+        obj = self.transpile_expression(obj_raw)
         sl = expr.slice
+
+        # Check if the object is a string
+        is_str = False
+        if isinstance(obj_raw, ast.Name) and self.local_vars.get(obj_raw.id, "") == "String":
+            is_str = True
+        elif isinstance(obj_raw, ast.Constant) and isinstance(obj_raw.value, str):
+            is_str = True
+        elif ".to_string()" in obj:
+            is_str = True
 
         if isinstance(sl, ast.Slice):
             lower = self.transpile_expression(sl.lower) if sl.lower else "0"
             upper = self.transpile_expression(sl.upper) if sl.upper else f"({obj}).len()"
+            if is_str:
+                if sl.step:
+                    step = self.transpile_expression(sl.step)
+                    chars = f"({obj}).chars().skip({lower} as usize).take(({upper} - {lower}) as usize)"
+                    return f"({chars}).step_by({step} as usize).collect::<String>()"
+                return f"({obj}).chars().skip({lower} as usize).take(({upper} - {lower}) as usize).collect::<String>()"
             if sl.step:
                 step = self.transpile_expression(sl.step)
                 return f"({obj})[({lower} as usize..{upper} as usize).step_by({step} as usize)]"
             return f"({obj})[{lower} as usize..{upper} as usize]"
 
         key = self.transpile_expression(sl)
+        if is_str:
+            if isinstance(sl, ast.Constant) and isinstance(sl.value, int):
+                return f"({obj}).as_bytes()[{sl.value} as usize] as char"
+            return f"({obj}).as_bytes()[({key}) as usize] as char"
         if isinstance(sl, ast.Constant) and isinstance(sl.value, int):
             return f"({obj})[{sl.value} as usize]"
         elif " " in key or "+" in key or "-" in key or "*" in key or "/" in key:
@@ -1962,7 +2172,7 @@ impl {name} {{
             return "()"
         elif isinstance(expr, ast.Call):
             if isinstance(expr.func, ast.Name):
-                if expr.func.id in ("int", "i64"):
+                if expr.func.id in ("int", "i64", "len", "range", "abs", "ord", "count", "hash", "id"):
                     return "i64"
                 elif expr.func.id in ("float", "f64"):
                     return "f64"
@@ -1978,6 +2188,21 @@ impl {name} {{
                     return "HashSet<PyObject>"
                 elif expr.func.id == "tuple":
                     return "()"
+            elif isinstance(expr.func, ast.Attribute):
+                if isinstance(expr.func.value, ast.Name) and expr.func.value.id in ("cp", "copperhead"):
+                    attr = expr.func.attr
+                    if attr in ("f64", "f32"):
+                        return attr
+                    if attr in ("i64", "i32", "i16", "i8", "u64", "u32", "u16", "u8", "usize", "isize"):
+                        return attr
+                    if attr == "bool":
+                        return "bool"
+                    if attr == "str":
+                        return "String"
+                    if attr == "Vec":
+                        return "Vec<PyObject>"
+                    if attr == "HashMap":
+                        return "HashMap<String, PyObject>"
             return "PyObject"
         elif isinstance(expr, ast.Name):
             if expr.id in ("True", "False"):

@@ -1,0 +1,41 @@
+module_id,module_name,function,category,difficulty,description,tags,python_time_us,rust_time_us,speedup,iterations,input_size
+basic_sum,basic_sum,sum_list,math,basic,Sum a list of numbers,math;sum;aggregate;math;basic,195.22,171.51,1.1,1000,10000
+basic_max,basic_max,find_max,math,basic,Find maximum value in a list,math;max;search;math;basic,150.90,155.06,1.0,1000,10000
+basic_clamp,basic_clamp,clamp,math,basic,Clamp a value between min and max,math;clamp;bounds;math;basic,0.09,0.21,0.4,1000,1
+basic_average,basic_average,average,math,basic,Calculate the average of a list,math;average;mean;statistics;math;basic,251.41,186.35,1.3,1000,10000
+basic_count,basic_count,count_occurrences,search,basic,Count occurrences of a value in a list,search;count;frequency;search;basic,23.14,21.78,1.1,1000,1000
+adv_fibonacci,adv_fibonacci,fibonacci,number-theory,advanced,Calculate Fibonacci numbers iteratively,math;fibonacci;sequence;recursion;number-theory;advanced,0.91,0.24,3.9,1000,1
+adv_prime_check,adv_prime_check,is_prime,number-theory,advanced,Check if a number is prime,math;prime;number-theory;number-theory;advanced,48.50,1.72,28.2,1000,1
+adv_gcd,adv_gcd,gcd,number-theory,advanced,Greatest Common Divisor (Euclidean algorithm),math;gcd;number-theory;euclidean;number-theory;advanced,0.16,0.18,0.9,1000,1
+adv_factorial,adv_factorial,factorial,number-theory,advanced,Calculate factorial iteratively,math;factorial;number-theory;number-theory;advanced,0.75,0.19,3.9,1000,1
+adv_prime_sieve,adv_prime_sieve,prime_sieve,number-theory,advanced,Sieve of Eratosthenes - find all primes up to n,math;prime;sieve;number-theory;number-theory;advanced,65.47,12.78,5.1,1000,1
+adv_bubblesort,adv_bubblesort,bubble_sort,sort,advanced,Bubble sort algorithm,sort;algorithm;bubble;sort;advanced,337.90,25.44,13.3,1000,100
+adv_quicksort,adv_quicksort,quick_sort,sort,advanced,Quicksort algorithm,sort;algorithm;quicksort;divide-conquer;sort;advanced,1501.19,455.40,3.3,1000,1000
+adv_mergesort,adv_mergesort,merge_sort,sort,advanced,Merge sort algorithm,sort;algorithm;mergesort;divide-conquer;sort;advanced,1621.86,668.26,2.4,1000,1000
+adv_insertion_sort,adv_insertion_sort,insertion_sort,sort,advanced,Insertion sort algorithm,sort;algorithm;insertion;sort;advanced,136.62,10.36,13.2,1000,100
+adv_linear_search,adv_linear_search,linear_search,search,advanced,Linear search in a list,search;algorithm;linear;search;advanced,17.96,26.13,0.7,1000,1000
+adv_binary_search,adv_binary_search,binary_search,search,advanced,Binary search on a sorted list,search;algorithm;binary;divide-conquer;search;advanced,1.09,23.92,0.0,1000,1000
+stat_variance,stat_variance,variance,statistics,intermediate,Calculate variance of a list,statistics;variance;spread;statistics;intermediate,117.96,14.65,8.1,1000,1000
+stat_stddev,stat_stddev,stddev,statistics,intermediate,Calculate standard deviation of a list,statistics;stddev;spread;statistics;intermediate,116.39,12.64,9.2,1000,1000
+stat_median,stat_median,median,statistics,intermediate,Calculate the median of a list,statistics;median;central-tendency;statistics;intermediate,76.65,27.85,2.8,1000,1000
+stat_moving_avg,stat_moving_avg,moving_average,statistics,intermediate,Moving average with window size k,statistics;moving-average;smoothing;signal;statistics;intermediate,296.10,52.99,5.6,1000,1000
+stat_pearson,stat_pearson,pearson_correlation,statistics,advanced,Pearson correlation coefficient,statistics;correlation;pearson;statistics;advanced,145.23,25.81,5.6,1000,1000
+stat_linreg,stat_linreg,linear_regression,statistics,advanced,Simple linear regression (slope and intercept),statistics;regression;linear;statistics;advanced,112.21,27.16,4.1,1000,1000
+la_dot_product,la_dot_product,dot_product,linear-algebra,intermediate,Dot product of two vectors,linear-algebra;dot-product;vector;linear-algebra;intermediate,59.89,33.44,1.8,1000,1000
+la_vec_add,la_vec_add,vector_add,linear-algebra,basic,Element-wise vector addition,linear-algebra;vector;addition;linear-algebra;basic,45.93,56.67,0.8,1000,1000
+la_vec_scale,la_vec_scale,vector_scale,linear-algebra,basic,Scale a vector by a scalar,linear-algebra;vector;scale;linear-algebra;basic,37.57,29.16,1.3,1000,1000
+la_matrix_mul,la_matrix_mul,matrix_multiply,linear-algebra,advanced,Multiply two matrices,linear-algebra;matrix;multiply;linear-algebra;advanced,42.85,7.18,6.0,1000,8
+la_matrix_transpose,la_matrix_transpose,matrix_transpose,linear-algebra,intermediate,Transpose a matrix,linear-algebra;matrix;transpose;linear-algebra;intermediate,2.73,3.64,0.7,1000,8
+dist_euclidean,dist_euclidean,euclidean_distance,distance,intermediate,Euclidean distance between two vectors,distance;euclidean;vector;distance;intermediate,90.45,20.96,4.3,1000,1000
+dist_manhattan,dist_manhattan,manhattan_distance,distance,intermediate,Manhattan distance between two vectors,distance;manhattan;vector;distance;intermediate,92.72,23.97,3.9,1000,1000
+dist_cosine,dist_cosine,cosine_similarity,distance,advanced,Cosine similarity between two vectors,distance;cosine;similarity;vector;distance;advanced,198.23,17.44,11.4,1000,1000
+dist_levenshtein,dist_levenshtein,levenshtein,string,advanced,Levenshtein edit distance between two strings,string;distance;edit;levenshtein;string;advanced,14.01,1.52,9.2,1000,6
+str_reverse,str_reverse,reverse_string,string,basic,Reverse a string,string;reverse;manipulation;string;basic,0.64,1.91,0.3,1000,430
+str_count_words,str_count_words,count_words,string,basic,Count words in a string,string;count;words;text;string;basic,2.95,0.56,5.2,1000,430
+str_palindrome,str_palindrome,is_palindrome,string,basic,Check if a string is a palindrome,string;palindrome;check;string;basic,0.26,0.14,1.9,1000,7
+dp_histogram,dp_histogram,build_histogram,data-processing,intermediate,Build a histogram from data,data-processing;histogram;bin;distribution;data-processing;intermediate,249.05,14.89,16.7,1000,1000
+dp_normalize,dp_normalize,normalize,data-processing,intermediate,"Normalize data to [0, 1] range",data-processing;normalize;scale;data-processing;intermediate,147.16,28.15,5.2,1000,1000
+dp_convolve,dp_convolve,convolve_1d,data-processing,advanced,1D convolution (signal processing),data-processing;convolution;signal;filter;data-processing;advanced,934.31,39.14,23.9,1000,1000
+dp_zscore,dp_zscore,zscore,data-processing,intermediate,Z-score standardization of data,data-processing;zscore;standardize;statistics;data-processing;intermediate,262.33,26.02,10.1,1000,1000
+misc_sqrt_newton,misc_sqrt_newton,sqrt_newton,math,advanced,Square root via Newton's method,math;sqrt;newton;iterative;math;advanced,1.46,0.16,8.9,1000,1
+misc_mandelbrot,misc_mandelbrot,mandelbrot,math,advanced,Mandelbrot set membership check,math;fractal;mandelbrot;complex;math;advanced,127.47,3.31,38.5,1000,1

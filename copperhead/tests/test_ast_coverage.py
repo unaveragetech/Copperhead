@@ -130,7 +130,7 @@ class TestStatementAssign:
             'def f() -> cp.i64:\n'
             '    a, b = 1, 2\n'
             '    return a + b\n',
-            expected_patterns=["let (a, b) = (1, 2);"]
+            expected_patterns=["let mut (a, b) = (1, 2);"]
         )
 
     def test_subscript_assign(self):
@@ -353,7 +353,7 @@ class TestStatementFor:
             '    for x in items:\n'
             '        s += x\n'
             '    return s\n',
-            expected_patterns=["for x in (items).into_iter()"]
+            expected_patterns=["for x in (items).iter().copied()"]
         )
 
     def test_for_enumerate(self):
@@ -907,7 +907,7 @@ class TestExprBinOp:
             '@cp.compile(target="rust")\n'
             'def f(a: cp.f64, b: cp.f64) -> cp.f64:\n'
             '    return a / b\n',
-            expected_patterns=["(a / b)"]
+            expected_patterns=["as f64 /"]
         )
 
     def test_floor_div(self):
@@ -1221,7 +1221,7 @@ class TestExprCall:
             '@cp.compile(target="rust")\n'
             'def f(x: list[cp.i64]):\n'
             '    return sorted(x)\n',
-            expected_patterns=["sorted()"]
+            expected_patterns=["sort_by"]
         )
 
     def test_builtin_reversed(self):
@@ -1330,7 +1330,7 @@ class TestExprCall:
             'def f() -> cp.i64:\n'
             '    a, b = divmod(10, 3)\n'
             '    return a\n',
-            expected_patterns=["let (a, b) ="]
+            expected_patterns=["let mut (a, b) ="]
         )
 
     def test_builtin_type(self):
@@ -1413,7 +1413,7 @@ class TestExprAttribute:
             '@cp.compile(target="rust")\n'
             'def f(x: cp.f64) -> cp.f64:\n'
             '    return cp.math.sin(x)\n',
-            expected_patterns=["math::sin(x)"]
+            expected_patterns=["(x).sin()"]
         )
 
 

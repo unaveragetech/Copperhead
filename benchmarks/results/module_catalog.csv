@@ -1,0 +1,568 @@
+module_id,module_name,version,author,status,category,difficulty,description,function_name,function_args,return_type,function_description,is_rpb,no_gil,examples,tags,dependencies,usage_count,rating,created_at,source_code,has_rust_code,has_tests
+basic_sum,basic_sum,1.0.0,Copperhead,Compiled,math,basic,Sum a list of numbers,sum_list,numbers: list[cp.f64],cp.f64,Calculate the sum of a list of floating point numbers,Yes,No,"sum_list([1.0, 2.0, 3.0]) -> 6.0",math;sum;aggregate;math;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def sum_list(numbers: list[cp.f64]) -> cp.f64:
+    total = cp.f64(0)
+    for num in numbers:
+        total += num
+    return total",Yes,No
+basic_max,basic_max,1.0.0,Copperhead,Compiled,math,basic,Find maximum value in a list,find_max,numbers: list[cp.f64],cp.f64,Find the maximum value in a list of numbers,Yes,No,"find_max([3.0, 1.0, 4.0, 1.0, 5.0]) -> 5.0",math;max;search;math;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def find_max(numbers: list[cp.f64]) -> cp.f64:
+    if len(numbers) == 0:
+        return cp.f64(0)
+    max_val = numbers[0]
+    for num in numbers:
+        if num > max_val:
+            max_val = num
+    return max_val",Yes,No
+basic_clamp,basic_clamp,1.0.0,Copperhead,Compiled,math,basic,Clamp a value between min and max,clamp,value: cp.f64; min_val: cp.f64; max_val: cp.f64,cp.f64,Clamp a value between min and max bounds,Yes,No,"clamp(5.0, 0.0, 10.0) -> 5.0",math;clamp;bounds;math;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def clamp(value: cp.f64, min_val: cp.f64, max_val: cp.f64) -> cp.f64:
+    if value < min_val:
+        return min_val
+    if value > max_val:
+        return max_val
+    return value",Yes,No
+basic_average,basic_average,1.0.0,Copperhead,Compiled,math,basic,Calculate the average of a list,average,numbers: list[cp.f64],cp.f64,Calculate the arithmetic mean of a list of numbers,Yes,No,"average([1.0, 2.0, 3.0, 4.0, 5.0]) -> 3.0",math;average;mean;statistics;math;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def average(numbers: list[cp.f64]) -> cp.f64:
+    if len(numbers) == 0:
+        return cp.f64(0)
+    total = cp.f64(0)
+    for num in numbers:
+        total += num
+    return total / len(numbers)",Yes,No
+basic_count,basic_count,1.0.0,Copperhead,Compiled,search,basic,Count occurrences of a value in a list,count_occurrences,items: list[cp.i64]; target: cp.i64,cp.i64,Count how many times target appears in items,Yes,No,"count_occurrences([1, 2, 2, 3, 2], 2) -> 3",search;count;frequency;search;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def count_occurrences(items: list[cp.i64], target: cp.i64) -> cp.i64:
+    count = 0
+    for item in items:
+        if item == target:
+            count += 1
+    return count",Yes,No
+adv_fibonacci,adv_fibonacci,1.0.0,Copperhead,Compiled,number-theory,advanced,Calculate Fibonacci numbers iteratively,fibonacci,n: cp.i64,cp.i64,Calculate the nth Fibonacci number iteratively,Yes,No,fibonacci(10) -> 55,math;fibonacci;sequence;recursion;number-theory;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def fibonacci(n: cp.i64) -> cp.i64:
+    if n <= 0:
+        return 0
+    if n == 1:
+        return 1
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b",Yes,No
+adv_prime_check,adv_prime_check,1.0.0,Copperhead,Compiled,number-theory,advanced,Check if a number is prime,is_prime,n: cp.i64,cp.bool,Check if a number is prime,Yes,No,is_prime(7) -> True | is_prime(4) -> False,math;prime;number-theory;number-theory;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def is_prime(n: cp.i64) -> cp.bool:
+    if n < 2:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    i = 3
+    while i * i <= n:
+        if n % i == 0:
+            return False
+        i += 2
+    return True",Yes,No
+adv_gcd,adv_gcd,1.0.0,Copperhead,Compiled,number-theory,advanced,Greatest Common Divisor (Euclidean algorithm),gcd,a: cp.i64; b: cp.i64,cp.i64,Calculate the GCD of two numbers using Euclidean algorithm,Yes,No,"gcd(12, 8) -> 4",math;gcd;number-theory;euclidean;number-theory;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def gcd(a: cp.i64, b: cp.i64) -> cp.i64:
+    while b:
+        a, b = b, a % b
+    return a",Yes,No
+adv_factorial,adv_factorial,1.0.0,Copperhead,Compiled,number-theory,advanced,Calculate factorial iteratively,factorial,n: cp.i64,cp.i64,Calculate the factorial of n iteratively,Yes,No,factorial(5) -> 120,math;factorial;number-theory;number-theory;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def factorial(n: cp.i64) -> cp.i64:
+    if n <= 1:
+        return 1
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result",Yes,No
+adv_prime_sieve,adv_prime_sieve,1.0.0,Copperhead,Compiled,number-theory,advanced,Sieve of Eratosthenes - find all primes up to n,prime_sieve,n: cp.i64,list[cp.i64],Find all prime numbers up to n using Sieve of Eratosthenes,Yes,No,"prime_sieve(10) -> [2, 3, 5, 7]",math;prime;sieve;number-theory;number-theory;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def prime_sieve(n: cp.i64) -> list[cp.i64]:
+    if n < 2:
+        return []
+    sieve = [True] * (n + 1)
+    sieve[0] = False
+    sieve[1] = False
+    i = 2
+    while i * i <= n:
+        if sieve[i]:
+            j = i * i
+            while j <= n:
+                sieve[j] = False
+                j += i
+        i += 1
+    result = []
+    for i in range(2, n + 1):
+        if sieve[i]:
+            result.append(i)
+    return result",Yes,No
+adv_bubblesort,adv_bubblesort,1.0.0,Copperhead,Compiled,sort,advanced,Bubble sort algorithm,bubble_sort,arr: list[cp.f64],list[cp.f64],Sort a list of numbers using bubble sort,Yes,No,"bubble_sort([3.0, 1.0, 4.0]) -> [1.0, 3.0, 4.0]",sort;algorithm;bubble;sort;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def bubble_sort(arr: list[cp.f64]) -> list[cp.f64]:
+    n = len(arr)
+    result = list(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if result[j] > result[j + 1]:
+                result[j], result[j + 1] = result[j + 1], result[j]
+    return result",Yes,No
+adv_quicksort,adv_quicksort,1.0.0,Copperhead,Compiled,sort,advanced,Quicksort algorithm,quick_sort,arr: list[cp.f64],list[cp.f64],Sort a list of numbers using quicksort,Yes,No,"quick_sort([3.0, 1.0, 4.0]) -> [1.0, 3.0, 4.0]",sort;algorithm;quicksort;divide-conquer;sort;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def quick_sort(arr: list[cp.f64]) -> list[cp.f64]:
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = []
+    middle = []
+    right = []
+    for x in arr:
+        if x < pivot:
+            left.append(x)
+        elif x == pivot:
+            middle.append(x)
+        else:
+            right.append(x)
+    left = quick_sort(left)
+    right = quick_sort(right)
+    result = left + middle + right
+    return result",Yes,No
+adv_mergesort,adv_mergesort,1.0.0,Copperhead,Compiled,sort,advanced,Merge sort algorithm,merge_sort,arr: list[cp.f64],list[cp.f64],Sort a list of numbers using merge sort,Yes,No,"merge_sort([3.0, 1.0, 4.0]) -> [1.0, 3.0, 4.0]",sort;algorithm;mergesort;divide-conquer;sort;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def merge_sort(arr: list[cp.f64]) -> list[cp.f64]:
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    result = []
+    i = 0
+    j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    while i < len(left):
+        result.append(left[i])
+        i += 1
+    while j < len(right):
+        result.append(right[j])
+        j += 1
+    return result",Yes,No
+adv_insertion_sort,adv_insertion_sort,1.0.0,Copperhead,Compiled,sort,advanced,Insertion sort algorithm,insertion_sort,arr: list[cp.f64],list[cp.f64],Sort a list of numbers using insertion sort,Yes,No,"insertion_sort([3.0, 1.0, 4.0]) -> [1.0, 3.0, 4.0]",sort;algorithm;insertion;sort;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def insertion_sort(arr: list[cp.f64]) -> list[cp.f64]:
+    result = list(arr)
+    for i in range(1, len(result)):
+        key = result[i]
+        j = i - 1
+        while j >= 0 and result[j] > key:
+            result[j + 1] = result[j]
+            j -= 1
+        result[j + 1] = key
+    return result",Yes,No
+adv_linear_search,adv_linear_search,1.0.0,Copperhead,Compiled,search,advanced,Linear search in a list,linear_search,arr: list[cp.i64]; target: cp.i64,cp.i64,"Search for target in arr, return index or -1 if not found",Yes,No,"linear_search([1,2,3,4,5], 3) -> 2",search;algorithm;linear;search;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def linear_search(arr: list[cp.i64], target: cp.i64) -> cp.i64:
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i
+    return -1",Yes,No
+adv_binary_search,adv_binary_search,1.0.0,Copperhead,Compiled,search,advanced,Binary search on a sorted list,binary_search,arr: list[cp.i64]; target: cp.i64,cp.i64,Search for target in a sorted list using binary search,Yes,No,"binary_search([1,2,3,4,5], 3) -> 2",search;algorithm;binary;divide-conquer;search;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def binary_search(arr: list[cp.i64], target: cp.i64) -> cp.i64:
+    lo = 0
+    hi = len(arr) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1",Yes,No
+stat_variance,stat_variance,1.0.0,Copperhead,Compiled,statistics,intermediate,Calculate variance of a list,variance,data: list[cp.f64],cp.f64,Calculate the population variance of a dataset,Yes,No,"variance([1.0, 2.0, 3.0, 4.0, 5.0]) -> 2.0",statistics;variance;spread;statistics;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def variance(data: list[cp.f64]) -> cp.f64:
+    n = len(data)
+    if n == 0:
+        return cp.f64(0)
+    mean = cp.f64(0)
+    for x in data:
+        mean += x
+    mean = mean / n
+    ssd = cp.f64(0)
+    for x in data:
+        diff = x - mean
+        ssd += diff * diff
+    return ssd / n",Yes,No
+stat_stddev,stat_stddev,1.0.0,Copperhead,Compiled,statistics,intermediate,Calculate standard deviation of a list,stddev,data: list[cp.f64],cp.f64,Calculate the population standard deviation of a dataset,Yes,No,"stddev([1.0, 2.0, 3.0, 4.0, 5.0]) -> 1.414...",statistics;stddev;spread;statistics;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def stddev(data: list[cp.f64]) -> cp.f64:
+    n = len(data)
+    if n == 0:
+        return cp.f64(0)
+    mean = cp.f64(0)
+    for x in data:
+        mean += x
+    mean = mean / n
+    ssd = cp.f64(0)
+    for x in data:
+        diff = x - mean
+        ssd += diff * diff
+    return cp.math.sqrt(ssd / n)",Yes,No
+stat_median,stat_median,1.0.0,Copperhead,Compiled,statistics,intermediate,Calculate the median of a list,median,data: list[cp.f64],cp.f64,Calculate the median value of a sorted dataset,Yes,No,"median([1.0, 2.0, 3.0, 4.0, 5.0]) -> 3.0",statistics;median;central-tendency;statistics;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def median(data: list[cp.f64]) -> cp.f64:
+    n = len(data)
+    if n == 0:
+        return cp.f64(0)
+    sorted_data = sorted(data)
+    mid = n // 2
+    if n % 2 == 0:
+        return (sorted_data[mid - 1] + sorted_data[mid]) / 2.0
+    return sorted_data[mid]",Yes,No
+stat_moving_avg,stat_moving_avg,1.0.0,Copperhead,Compiled,statistics,intermediate,Moving average with window size k,moving_average,data: list[cp.f64]; window: cp.i64,list[cp.f64],Calculate the moving average of a data series with given window size,Yes,No,"moving_average([1.0,2.0,3.0,4.0,5.0], 3) -> [2.0, 3.0, 4.0]",statistics;moving-average;smoothing;signal;statistics;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def moving_average(data: list[cp.f64], window: cp.i64) -> list[cp.f64]:
+    n = len(data)
+    w = window
+    result = []
+    for i in range(n - w + 1):
+        s = cp.f64(0)
+        for j in range(w):
+            s += data[i + j]
+        result.append(s / w)
+    return result",Yes,No
+stat_pearson,stat_pearson,1.0.0,Copperhead,Compiled,statistics,advanced,Pearson correlation coefficient,pearson_correlation,x: list[cp.f64]; y: list[cp.f64],cp.f64,Calculate the Pearson correlation coefficient between two datasets,Yes,No,"pearson_correlation([1,2,3], [2,4,6]) -> 1.0",statistics;correlation;pearson;statistics;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def pearson_correlation(x: list[cp.f64], y: list[cp.f64]) -> cp.f64:
+    n = len(x)
+    if n == 0 or n != len(y):
+        return cp.f64(0)
+    sum_x = cp.f64(0)
+    sum_y = cp.f64(0)
+    sum_xy = cp.f64(0)
+    sum_x2 = cp.f64(0)
+    sum_y2 = cp.f64(0)
+    for i in range(n):
+        sum_x += x[i]
+        sum_y += y[i]
+        sum_xy += x[i] * y[i]
+        sum_x2 += x[i] * x[i]
+        sum_y2 += y[i] * y[i]
+    numerator = n * sum_xy - sum_x * sum_y
+    denominator = cp.math.sqrt((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y))
+    if denominator == 0.0:
+        return cp.f64(0)
+    return numerator / denominator",Yes,No
+stat_linreg,stat_linreg,1.0.0,Copperhead,Compiled,statistics,advanced,Simple linear regression (slope and intercept),linear_regression,x: list[cp.f64]; y: list[cp.f64],list[cp.f64],"Fit a line y = mx + b and return [slope, intercept]",Yes,No,"linear_regression([0,1,2,3], [1,3,5,7]) -> [2.0, 1.0]",statistics;regression;linear;statistics;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def linear_regression(x: list[cp.f64], y: list[cp.f64]) -> list[cp.f64]:
+    n = len(x)
+    if n == 0 or n != len(y):
+        return [cp.f64(0), cp.f64(0)]
+    sum_x = cp.f64(0)
+    sum_y = cp.f64(0)
+    sum_xy = cp.f64(0)
+    sum_x2 = cp.f64(0)
+    for i in range(n):
+        sum_x += x[i]
+        sum_y += y[i]
+        sum_xy += x[i] * y[i]
+        sum_x2 += x[i] * x[i]
+    denom = n * sum_x2 - sum_x * sum_x
+    if denom == 0.0:
+        return [cp.f64(0), sum_y / n]
+    slope = (n * sum_xy - sum_x * sum_y) / denom
+    intercept = (sum_y - slope * sum_x) / n
+    return [slope, intercept]",Yes,No
+la_dot_product,la_dot_product,1.0.0,Copperhead,Compiled,linear-algebra,intermediate,Dot product of two vectors,dot_product,a: list[cp.f64]; b: list[cp.f64],cp.f64,Calculate the dot product of two vectors,Yes,No,"dot_product([1.0, 2.0, 3.0], [4.0, 5.0, 6.0]) -> 32.0",linear-algebra;dot-product;vector;linear-algebra;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def dot_product(a: list[cp.f64], b: list[cp.f64]) -> cp.f64:
+    n = len(a)
+    result = cp.f64(0)
+    for i in range(n):
+        result += a[i] * b[i]
+    return result",Yes,No
+la_vec_add,la_vec_add,1.0.0,Copperhead,Compiled,linear-algebra,basic,Element-wise vector addition,vector_add,a: list[cp.f64]; b: list[cp.f64],list[cp.f64],Add two vectors element-wise,Yes,No,"vector_add([1.0, 2.0], [3.0, 4.0]) -> [4.0, 6.0]",linear-algebra;vector;addition;linear-algebra;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def vector_add(a: list[cp.f64], b: list[cp.f64]) -> list[cp.f64]:
+    n = len(a)
+    result = []
+    for i in range(n):
+        result.append(a[i] + b[i])
+    return result",Yes,No
+la_vec_scale,la_vec_scale,1.0.0,Copperhead,Compiled,linear-algebra,basic,Scale a vector by a scalar,vector_scale,v: list[cp.f64]; scalar: cp.f64,list[cp.f64],Multiply each element of a vector by a scalar,Yes,No,"vector_scale([1.0, 2.0, 3.0], 2.0) -> [2.0, 4.0, 6.0]",linear-algebra;vector;scale;linear-algebra;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def vector_scale(v: list[cp.f64], scalar: cp.f64) -> list[cp.f64]:
+    result = []
+    for i in range(len(v)):
+        result.append(v[i] * scalar)
+    return result",Yes,No
+la_matrix_mul,la_matrix_mul,1.0.0,Copperhead,Compiled,linear-algebra,advanced,Multiply two matrices,matrix_multiply,a: list[list[cp.f64]]; b: list[list[cp.f64]],list[list[cp.f64]],Multiply two matrices and return the result,Yes,No,"matrix_multiply([[1,2],[3,4]], [[5,6],[7,8]]) -> [[19,22],[43,50]]",linear-algebra;matrix;multiply;linear-algebra;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def matrix_multiply(a: list[list[cp.f64]], b: list[list[cp.f64]]) -> list[list[cp.f64]]:
+    rows_a = len(a)
+    cols_a = len(a[0])
+    cols_b = len(b[0])
+    result = [[cp.f64(0) for _ in range(cols_b)] for _ in range(rows_a)]
+    for i in range(rows_a):
+        for j in range(cols_b):
+            for k in range(cols_a):
+                result[i][j] += a[i][k] * b[k][j]
+    return result",Yes,No
+la_matrix_transpose,la_matrix_transpose,1.0.0,Copperhead,Compiled,linear-algebra,intermediate,Transpose a matrix,matrix_transpose,m: list[list[cp.f64]],list[list[cp.f64]],Transpose a matrix (swap rows and columns),Yes,No,"matrix_transpose([[1,2],[3,4]]) -> [[1,3],[2,4]]",linear-algebra;matrix;transpose;linear-algebra;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def matrix_transpose(m: list[list[cp.f64]]) -> list[list[cp.f64]]:
+    rows = len(m)
+    cols = len(m[0])
+    result = [[cp.f64(0) for _ in range(rows)] for _ in range(cols)]
+    for i in range(rows):
+        for j in range(cols):
+            result[j][i] = m[i][j]
+    return result",Yes,No
+dist_euclidean,dist_euclidean,1.0.0,Copperhead,Compiled,distance,intermediate,Euclidean distance between two vectors,euclidean_distance,a: list[cp.f64]; b: list[cp.f64],cp.f64,Calculate the Euclidean distance between two vectors,Yes,No,"euclidean_distance([0,0], [3,4]) -> 5.0",distance;euclidean;vector;distance;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def euclidean_distance(a: list[cp.f64], b: list[cp.f64]) -> cp.f64:
+    n = len(a)
+    ssd = cp.f64(0)
+    for i in range(n):
+        diff = a[i] - b[i]
+        ssd += diff * diff
+    return cp.math.sqrt(ssd)",Yes,No
+dist_manhattan,dist_manhattan,1.0.0,Copperhead,Compiled,distance,intermediate,Manhattan distance between two vectors,manhattan_distance,a: list[cp.f64]; b: list[cp.f64],cp.f64,Calculate the Manhattan (L1) distance between two vectors,Yes,No,"manhattan_distance([0,0], [3,4]) -> 7.0",distance;manhattan;vector;distance;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def manhattan_distance(a: list[cp.f64], b: list[cp.f64]) -> cp.f64:
+    n = len(a)
+    total = cp.f64(0)
+    for i in range(n):
+        diff = a[i] - b[i]
+        if diff < 0.0:
+            diff = -diff
+        total += diff
+    return total",Yes,No
+dist_cosine,dist_cosine,1.0.0,Copperhead,Compiled,distance,advanced,Cosine similarity between two vectors,cosine_similarity,a: list[cp.f64]; b: list[cp.f64],cp.f64,Calculate the cosine similarity between two vectors,Yes,No,"cosine_similarity([1,0], [1,1]) -> 0.707...",distance;cosine;similarity;vector;distance;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def cosine_similarity(a: list[cp.f64], b: list[cp.f64]) -> cp.f64:
+    n = len(a)
+    dot = cp.f64(0)
+    norm_a = cp.f64(0)
+    norm_b = cp.f64(0)
+    for i in range(n):
+        dot += a[i] * b[i]
+        norm_a += a[i] * a[i]
+        norm_b += b[i] * b[i]
+    if norm_a == 0.0 or norm_b == 0.0:
+        return cp.f64(0)
+    return dot / (cp.math.sqrt(norm_a) * cp.math.sqrt(norm_b))",Yes,No
+dist_levenshtein,dist_levenshtein,1.0.0,Copperhead,Compiled,string,advanced,Levenshtein edit distance between two strings,levenshtein,s1: str; s2: str,cp.i64,Calculate the Levenshtein edit distance between two strings,Yes,No,"levenshtein('kitten', 'sitting') -> 3",string;distance;edit;levenshtein;string;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def levenshtein(s1: str, s2: str) -> cp.i64:
+    m = len(s1)
+    n = len(s2)
+    if m == 0:
+        return n
+    if n == 0:
+        return m
+    prev = list(range(n + 1))
+    for i in range(1, m + 1):
+        curr = [i] + [0] * n
+        for j in range(1, n + 1):
+            cost = 1
+            if s1[i - 1] == s2[j - 1]:
+                cost = 0
+            curr[j] = min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)
+        prev = curr
+    return prev[n]",Yes,No
+str_reverse,str_reverse,1.0.0,Copperhead,Compiled,string,basic,Reverse a string,reverse_string,s: str,str,Reverse a string character by character,Yes,No,reverse_string('hello') -> 'olleh',string;reverse;manipulation;string;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def reverse_string(s: str) -> str:
+    chars = list(s)
+    i = 0
+    j = len(chars) - 1
+    while i < j:
+        chars[i], chars[j] = chars[j], chars[i]
+        i += 1
+        j -= 1
+    return """".join(chars)",Yes,No
+str_count_words,str_count_words,1.0.0,Copperhead,Compiled,string,basic,Count words in a string,count_words,s: str,cp.i64,Count the number of words in a string (space-separated),Yes,No,count_words('hello world foo') -> 3,string;count;words;text;string;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def count_words(s: str) -> cp.i64:
+    count = 0
+    in_word = False
+    for ch in s:
+        if ch != "" "" and ch != ""\t"" and ch != ""\n"":
+            if not in_word:
+                count += 1
+                in_word = True
+        else:
+            in_word = False
+    return count",Yes,No
+str_palindrome,str_palindrome,1.0.0,Copperhead,Compiled,string,basic,Check if a string is a palindrome,is_palindrome,s: str,cp.bool,Check if a string reads the same forwards and backwards,Yes,No,is_palindrome('racecar') -> True,string;palindrome;check;string;basic,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def is_palindrome(s: str) -> cp.bool:
+    n = len(s)
+    i = 0
+    j = n - 1
+    while i < j:
+        if s[i] != s[j]:
+            return False
+        i += 1
+        j -= 1
+    return True",Yes,No
+dp_histogram,dp_histogram,1.0.0,Copperhead,Compiled,data-processing,intermediate,Build a histogram from data,build_histogram,data: list[cp.f64]; bins: cp.i64,list[cp.i64],Build a histogram with the given number of bins,Yes,No,"build_histogram([1,2,3,4,5], 2) -> [2, 3]",data-processing;histogram;bin;distribution;data-processing;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def build_histogram(data: list[cp.f64], bins: cp.i64) -> list[cp.i64]:
+    if len(data) == 0 or bins <= 0:
+        return []
+    lo = data[0]
+    hi = data[0]
+    for x in data:
+        if x < lo:
+            lo = x
+        if x > hi:
+            hi = x
+    if hi == lo:
+        return [len(data)]
+    width = (hi - lo) / bins
+    counts = [0] * bins
+    for x in data:
+        idx = int((x - lo) / width)
+        if idx >= bins:
+            idx = bins - 1
+        counts[idx] += 1
+    return counts",Yes,No
+dp_normalize,dp_normalize,1.0.0,Copperhead,Compiled,data-processing,intermediate,"Normalize data to [0, 1] range",normalize,data: list[cp.f64],list[cp.f64],"Normalize a list of values to the [0, 1] range (min-max normalization)",Yes,No,"normalize([0.0, 5.0, 10.0]) -> [0.0, 0.5, 1.0]",data-processing;normalize;scale;data-processing;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def normalize(data: list[cp.f64]) -> list[cp.f64]:
+    if len(data) == 0:
+        return []
+    lo = data[0]
+    hi = data[0]
+    for x in data:
+        if x < lo:
+            lo = x
+        if x > hi:
+            hi = x
+    if hi == lo:
+        return [cp.f64(0) for _ in data]
+    rng = hi - lo
+    result = []
+    for x in data:
+        result.append((x - lo) / rng)
+    return result",Yes,No
+dp_convolve,dp_convolve,1.0.0,Copperhead,Compiled,data-processing,advanced,1D convolution (signal processing),convolve_1d,signal: list[cp.f64]; kernel: list[cp.f64],list[cp.f64],Apply 1D convolution of signal with kernel,Yes,No,"convolve_1d([1,2,3,4,5], [1,0]) -> [1,2,3,4,5]",data-processing;convolution;signal;filter;data-processing;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def convolve_1d(signal: list[cp.f64], kernel: list[cp.f64]) -> list[cp.f64]:
+    n = len(signal)
+    k = len(kernel)
+    result = []
+    for i in range(n - k + 1):
+        s = cp.f64(0)
+        for j in range(k):
+            s += signal[i + j] * kernel[j]
+        result.append(s)
+    return result",Yes,No
+dp_zscore,dp_zscore,1.0.0,Copperhead,Compiled,data-processing,intermediate,Z-score standardization of data,zscore,data: list[cp.f64],list[cp.f64],Standardize data to zero mean and unit variance (z-scores),Yes,No,"zscore([1.0, 2.0, 3.0]) -> [-1.22, 0.0, 1.22]",data-processing;zscore;standardize;statistics;data-processing;intermediate,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def zscore(data: list[cp.f64]) -> list[cp.f64]:
+    n = len(data)
+    if n == 0:
+        return []
+    mean = cp.f64(0)
+    for x in data:
+        mean += x
+    mean = mean / n
+    ssd = cp.f64(0)
+    for x in data:
+        diff = x - mean
+        ssd += diff * diff
+    sd = cp.math.sqrt(ssd / n)
+    if sd == 0.0:
+        return [cp.f64(0) for _ in data]
+    result = []
+    for x in data:
+        result.append((x - mean) / sd)
+    return result",Yes,No
+misc_sqrt_newton,misc_sqrt_newton,1.0.0,Copperhead,Compiled,math,advanced,Square root via Newton's method,sqrt_newton,x: cp.f64,cp.f64,Calculate square root using Newton-Raphson iterative method,Yes,No,sqrt_newton(9.0) -> 3.0,math;sqrt;newton;iterative;math;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def sqrt_newton(x: cp.f64) -> cp.f64:
+    if x < 0.0:
+        return cp.f64(0)
+    if x == 0.0:
+        return cp.f64(0)
+    guess = x
+    for _ in range(100):
+        new_guess = (guess + x / guess) / 2.0
+        diff = new_guess - guess
+        if diff < 0.0:
+            diff = -diff
+        if diff < 1e-10:
+            return new_guess
+        guess = new_guess
+    return guess",Yes,No
+misc_mandelbrot,misc_mandelbrot,1.0.0,Copperhead,Compiled,math,advanced,Mandelbrot set membership check,mandelbrot,cx: cp.f64; cy: cp.f64; max_iter: cp.i64,cp.i64,"Check if point (cx, cy) is in the Mandelbrot set, return iteration count",Yes,No,"mandelbrot(-1.0, 0.0, 100) -> 100",math;fractal;mandelbrot;complex;math;advanced,,0,0.0,1782145399,"import copperhead as cp
+
+@cp.compile(target=""rust"")
+def mandelbrot(cx: cp.f64, cy: cp.f64, max_iter: cp.i64) -> cp.i64:
+    x = cp.f64(0)
+    y = cp.f64(0)
+    for i in range(max_iter):
+        x2 = x * x
+        y2 = y * y
+        if x2 + y2 > 4.0:
+            return i
+        x_new = x2 - y2 + cx
+        y = 2.0 * x * y + cy
+        x = x_new
+    return max_iter",Yes,No
