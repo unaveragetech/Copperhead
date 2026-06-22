@@ -337,6 +337,7 @@ pyo3 = { version = "0.23", features = ["extension-module"] }
 
 ### Transpiler Core Logic
 
+{% raw %}
 ```python
 class RustTranspiler:
     def __init__(self):
@@ -368,6 +369,7 @@ fn {name}({args}) -> PyResult<{return_type}> {{
 }}
 """
 ```
+{% endraw %}
 
 ---
 
