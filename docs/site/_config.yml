@@ -1,0 +1,5 @@
+theme: jekyll-theme-primer
+title: Copperhead
+description: Write Python. Run Rust.
+baseurl: /copperhead-rust-puthon
+url: https://unaveragetech.github.io
