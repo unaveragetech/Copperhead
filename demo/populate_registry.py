@@ -13,11 +13,17 @@ from copperhead.registry import ModuleRegistry, ModuleMetadata, FunctionSignatur
 def create_registry():
     """Create a fresh registry."""
     from copperhead.registry import ModuleRegistry
-    registry = ModuleRegistry()
-    # Remove old DB if exists
-    if os.path.exists(registry.db_path):
-        os.remove(registry.db_path)
-    return ModuleRegistry()
+    import tempfile
+    # Use default path inside package
+    pkg_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    db_path = os.path.join(pkg_dir, "copperhead", ".copperhead", "registry.db")
+    # Remove old DB if exists (handle Windows locks gracefully)
+    if os.path.exists(db_path):
+        try:
+            os.remove(db_path)
+        except PermissionError:
+            pass  # Will be overwritten by new connection
+    return ModuleRegistry(db_path=db_path)
 
 
 def populate_basic_examples(registry: ModuleRegistry):
