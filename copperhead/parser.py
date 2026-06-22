@@ -53,6 +53,7 @@ class FunctionInfo:
     no_gil: bool = False
     line: int = 0
     col: int = 0
+    body: Optional[List[Any]] = None  # AST statement list
 
 
 @dataclass
@@ -161,7 +162,8 @@ class CopperheadParser(ast.NodeVisitor):
             is_rpb=is_rpb,
             no_gil=no_gil,
             line=node.lineno,
-            col=node.col_offset
+            col=node.col_offset,
+            body=node.body
         )
         
         self.functions.append(func_info)
